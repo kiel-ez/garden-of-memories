@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yearbook - Garden of Memories</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: lime;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 0;
+            overflow: hidden;
+        }
+        #enter {
+            font-size: 24px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid lime; /* Cursor effect */
+            animation: blink 0.7s step-end infinite; /* Blinking cursor */
+            display: inline-block; /* Make it clickable */
+        }
+        .flower {
+            font-family: 'Courier New', Courier, monospace; /* Standard font for ASCII art */
+            font-size: 10px; /* Smaller size for mobile */
+            display: none; /* Hide initially */
+            white-space: pre; /* Preserve whitespace */
+        }
+        .loading-container {
+            display: none; /* Hide initially */
+            margin-top: 20px;
+            width: 80%;
+            height: 30px;
+            border: 1px solid lime;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-bar {
+            height: 100%;
+            width: 0;
+            background-color: lime;
+            position: absolute;
+            transition: width 2s linear; /* Smooth transition for loading */
+        }
+        h1, h2 {
+            display: none; /* Hide initially */
+            white-space: nowrap;
+            overflow: hidden; /* Hide overflow for typing effect */
+            font-family: 'Press Start 2P', cursive; /* Pixelated font */
+            font-size: 20px; /* Adjusted size for mobile */
+        }
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <div id="enter"></div>
+    <div class="loading-container">
+        <div class="loading-bar"></div>
+    </div> <!-- Loading bar -->
+    <pre class="flower" id="ascii-art"></pre>
+    <h1 id="title"></h1>
+    <h2 id="subtitle"></h2>
+
+    <script>
+        const asciiArt = `
+                           ,;;'''';;,                    ,;;;;, 
+                 ,        ;;'      \`;;,               .,;;;'   ; 
+              ,;;;       ;;          \`;;,';;;,.     ,%;;'     ' 
+            ,;;,;;       ;;         ,; \`;;;, \`;::.  %%;' 
+           ;;;,;;;       \`'       ,;;; ;;,;;, \`::,%%;' 
+           ;;;,;;;,          .,%%%%%'% ;;;;,;;   %;;; 
+ ,%,.      \`;;;,;;;,    .,%%%%%%%%%'%; ;;;;;,;;  %;;; 
+;, \`%%%%%%%%%%\`;;,;;'%%%%%%%%%%%%%'%%'  \`;;;;;,;, %;;; 
+;;;, \`%%%%%%%%%%%,; ..\`%%%%%%%%;'%%%'    \`;;;;,;; %%;; 
+ \`;;;;;, \`%%%%%,;;/, .. \`"""'',%%%%%      \`;;;;;; %%;;, 
+    \`;;;;;;;,;;/////,.    ,;%%%%%%%        \`;;;;, \`%%;; 
+           ;;;/%%%%,%///;;;';%%%%%%,          \`;;;%%;;, 
+          ;;;/%%%,%%%%%/;;;';;'%%%%%,             \`%%;; 
+         .;;/%%,%%%%%//;;'  ;;;'%%%%%,             %%;;, 
+         ;;//%,%%%%//;;;'   \`;;;;'%%%%             \`%;;; 
+         ;;//%,%//;;;;'      \`;;;;'%%%              %;;;, 
+         \`;;//,/;;;'          \`;;;'%%'              \`%;;; 
+           \`;;;;'               \`;'%'                \`;;;; 
+                                  '      .,,,.        \`;;;; 
+                                      ,;;;;;;;;;;,     \`;;;; 
+                                     ;;;'    ;;;,;;,    \`;;;; 
+                                     ;;;      ;;;;,;;.   \`;;;; 
+                                      \`;;      ;;;;;,;;   ;;;; 
+                                        \`'      \`;;;;,;;  ;;;; 
+                                                   \`;;,;, ;;;; 
+                                                      ;;, ;;;; 
+                                                        ';;;;; 
+                                                         ;;;;; 
+                                                        .;;;;' 
+                                                       .;;;;' 
+                                                      ;;;;;' 
+                                                     ,;;;;' 
+        `;
+        const enterDiv = document.getElementById('enter');
+        const loadingContainer = document.querySelector('.loading-container');
+        const loadingBar = document.querySelector('.loading-bar');
+        const title = document.getElementById('title');
+        const subtitle = document.getElementById('subtitle');
+        const asciiDiv = document.getElementById('ascii-art');
+
+        // Start transition function for both keyboard and click
+        function startTransition() {
+            if (enterDiv.style.opacity !== '0') { // Prevent multiple triggers
+                enterDiv.style.opacity = '0'; // Fade out the prompt
+                loadingContainer.style.display = 'block'; // Show loading bar
+                loadingBar.style.width = '0'; // Reset width
+                loadingBar.style.transition = 'none'; // Disable transition for instant reset
+
+                setTimeout(() => {
+                    loadingBar.style.transition = 'width 2s linear'; // Re-enable transition
+                    loadingBar.style.width = '100%'; // Fill the loading bar
+                }, 100); // Start filling after a short delay
+
+                setTimeout(() => {
+                    enterDiv.style.display = 'none'; // Hide the prompt
+                    loadingContainer.style.display = 'none'; // Hide loading bar
+                    asciiDiv.textContent = ""; // Clear ASCII art for typing effect
+                    typeAsciiArt(); // Start typing the ASCII art
+                }, 2200); // Show loading for 2 seconds
+            }
+        }
+
+        // Typing effect for ASCII art
+        function typeAsciiArt() {
+            let j = 0;
+            const artLength = asciiArt.length;
+
+            function type() {
+                if (j < artLength) {
+                    asciiDiv.textContent += asciiArt.charAt(j);
+                    j++;
+                    setTimeout(type, 5); // Speed of ASCII art typing
+                } else {
+                    // Keep the flower displayed once fully typed
+                    setTimeout(typeTitleAndSubtitle, 500); // Start typing title after a short delay
+                }
+            }
+            asciiDiv.style.display = 'block'; // Show ASCII art
+            type();
+        }
+
+        // Typing effect for title and subtitle
+        function typeTitleAndSubtitle() {
+            const titleText = "Garden of Memories";
+            const subtitleText = "2024 - 2025";
+            let k = 0, l = 0;
+
+            title.style.display = 'block'; // Show title immediately
+            subtitle.style.display = 'block'; // Show subtitle immediately
+
+            function typeTitle() {
+                if (k < titleText.length) {
+                    title.textContent += titleText.charAt(k);
+                    k++;
+                    setTimeout(typeTitle, 100); // Speed of title typing
+                } else {
+                    typeSubtitle(); // Start typing subtitle after title
+                }
+            }
+
+            function typeSubtitle() {
+                if (l < subtitleText.length) {
+                    subtitle.textContent += subtitleText.charAt(l);
+                    l++;
+                    setTimeout(typeSubtitle, 100); // Speed of subtitle typing
+                }
+            }
+
+            typeTitle();
+        }
+
+        // Typing effect for initial text
+        let i = 0;
+        function typeText() {
+            const text = "Click Enter";
+            if (i < text.length) {
+                enterDiv.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeText, 150); // Adjust speed of typing here
+            } else {
+                enterDiv.addEventListener('click', startTransition); // Attach click event after typing completes
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', typeText); // Start typing when content is loaded
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                startTransition();
+            }
+        });
+    </script>
+</body>
+</html>
